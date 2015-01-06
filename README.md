@@ -146,12 +146,15 @@ Skrypt jest w pełni zautomatyzowany, zatem po dłuższej chwili chwili, mamy ut
 ```
 D:\wamp\bin\php\php5.5.12>php d:\wamp\www\wiki\wikipedia.org-xmldump-mongodb.php
 ```
+|Czas|
+| ------------- |
+|4h 21m|
 
 Mając już zaimportowaną bazę danych wikipedii, napisałem następująca funkcję mapReduce:
 
 ```
 m = function() {
-	var tmp = this.revision.text.match(/\w+/g);
+	var tmp = this.revision.text.match(/[a-zA-Ząśżźęćńół]+/g);
 	if (tmp) {
 		for (var i = 0; i < tmp.length; i++)
 			emit(tmp[i], 1)
@@ -160,5 +163,56 @@ m = function() {
 r = function(key, values) {
 	return Array.sum(values);
 };
-var res = db.page.mapReduce(m, r, {out: "wikiwords"});
+var res = db.page.mapReduce(m, r, {out: "slowa"});
 ```
+
+|Czas|
+| ------------- |
+|8h 34m|
+
+```
+
+> res
+{
+        "result" : "slowa",
+        "timeMillis" : 20780416,
+        "counts" : {
+                "input" : 1671883,
+                "emit" : 596487211,
+                "reduce" : 63921156,
+                "output" : 4131470
+        },
+        "ok" : 1
+}
+```
+
+Pozostało sprawdzić, jakie słowa padają najczęściej. Wyniki nie zaskakują, bowiem spójniki pojawiają się najczęściej:
+
+```
+> db.slowa.find().sort({"value":-1}).limit(10)
+{ "_id" : "w", "value" : 20292468 }
+{ "_id" : "i", "value" : 5780516 }
+{ "_id" : "a", "value" : 5407771 }
+{ "_id" : "align", "value" : 4910641 }
+{ "_id" : "na", "value" : 4872846 }
+{ "_id" : "z", "value" : 4775000 }
+{ "_id" : "ref", "value" : 4264414 }
+{ "_id" : "o", "value" : 3722458 }
+{ "_id" : "data", "value" : 3514935 }
+{ "_id" : "Kategoria", "value" : 3169267 }
+```
+
+Same wyniki nie są może najlepsze bowiem wyszukują również słowa wykorzystywane podczas formatowania tekstu, lecz jak by nie patrzeć, są to również słowa. Tutaj trzeba by opierać się na zmienie wyrażenia regularnego. Aktualnie wykorzystałem:
+
+```
+/[a-zA-Ząśżźęćńół]+/g
+```
+
+Można by próbować dalej
+```
+/\s[a-zA-Ząśżźęćńół]+/g
+```
+lecz to i tak wciąż nie jest rozwiązanie idealne. Stworzenie idealnego regexa byłoby bardzo skomplikowane, wymagające wielu wyjątków, a i tak nie ma pewności czy ostateczny rezultat nie zmanipuluje wynikami. Zatem wyszedłem z założenia, że lepiej stworzyć prosty skrypt, który da wiarygodne wyniki lecz ze śmieciami, które później na etapie prezentacji danych można usunąć.
+
+
+
