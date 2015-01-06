@@ -216,7 +216,7 @@ Same wyniki nie są może najlepsze bowiem wyszukują również słowa wykorzyst
 
 Można by próbować dalej
 ```
-/\s[a-zA-Ząśżźęćńół]+/g
+/\s[a-ząśżźęćńół]+/gi
 ```
 lecz to i tak wciąż nie jest rozwiązanie idealne. Stworzenie idealnego regexa byłoby bardzo skomplikowane, wymagające wielu wyjątków, a i tak nie ma pewności czy ostateczny rezultat nie zmanipuluje wynikami. Zatem wyszedłem z założenia, że lepiej stworzyć prosty skrypt, który da wiarygodne wyniki lecz ze śmieciami, które później na etapie prezentacji danych można usunąć.
 
