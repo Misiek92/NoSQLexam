@@ -1,5 +1,11 @@
 #NoSQL Zadanie 3 Egzamin
 
+## Spis treści
+- [NoSQL Zadanie 3 Egzamin](#nosql-zadanie-3-egzamin)
+    - [Spis treści](#spis-treści)
+    - [Punkt pierwszy](#punkt-pierwszy)
+    - [Punkt drugi](#punkt-drugi)
+
 ## Punkt pierwszy
 ```
 Przygotować funkcje map i reduce, które:
