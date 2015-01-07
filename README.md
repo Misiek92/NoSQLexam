@@ -144,8 +144,7 @@ db.anagrams.find({$where: "this.value != null"}).count()
 
 Po pobraniu "plwiki-latest-pages-articles.xml.bz2" skorzystałem ze skryptu [xml-dump-import-mongodb](http://jameslinden.com/dataset/wikipedia.org/xml-dump-import-mongodb/) (do tego potrzebne było skonfigurowanie środowiska, oraz zainstalowanie rozszerzenia php-mongo)
 
-Dodatkowo, w związku z problemami podczas konfiguracji, potrzebna była drobna korekcja skryptu.
-
+Dodatkowo, w związku z problemami podczas konfiguracji, potrzebna była drobna korekcja skryptu. Jego zmodyfikowana wersja znajduje się [na moim repo](https://github.com/Misiek92/NoSQLexam/blob/master/skrypt%20php).
 
 Skrypt jest w pełni zautomatyzowany, zatem po dłuższej chwili chwili, mamy utworzoną już nową bazę z zaimportownymi danymi w czytelnej formie. Odpalenie, po skonfigurowaniu ograniczało się do:
 
