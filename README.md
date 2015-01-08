@@ -155,11 +155,67 @@ D:\wamp\bin\php\php5.5.12>php d:\wamp\www\wiki\wikipedia.org-xmldump-mongodb.php
 | ------------- |
 |4h 21m|
 
+Przykładowy rekord:
+```
+db.page.findOne()
+
+      "_id" : 4,
+      "title" : "Alergologia",
+      "ns" : {
+              "id" : 0,
+              "name" : null
+      },
+      "redirect" : false,
+      "revision" : {
+              "id" : 41351093,
+              "parent" : 35063052,
+              "timestamp" : ISODate("2014-12-27T16:38:14Z"),
+              "contributor" : {
+                      "id" : 632110,
+                      "username" : "Mishu57"
+              },
+              "minor" : false,
+              "comment" : "/* Linki zewnętrzne */ commons",
+              "sha1" : "5sgz8sbnobk66fyywx5p8v366s5p5zu",
+              "length" : 601,
+              "text" : "'''Alergologia''' - dziedzina [[medycyna|medycyny]] zajmująca się rozpoznawaniem i [[leczenie|
+czeniem]] [[alergia|schorzeń alergicznych]].\n\n== Zobacz też ==\n{{wikisłownik|alergologia}}\n* [[alergen]]\n\n== Lin
+ zewnętrzne ==\n{{commonscat|Allergology}}\n* [http://www.pta.med.pl/ Polskie Towarzystwo Alergologiczne]\n* [http://w
+.alergologia.org/ Portal Lekarzy Alergologów 'alergologia.org']\n* [http://alergie.mp.pl/ Alergie.mp.pl, serwis wydawn
+twa Medycyna Praktyczna]\n\n\n{{Zastrzeżenia|Medycyna}}\n\n{{Specjalności medyczne}}\n\n[[Kategoria:Alergologia| ]]\n[
+ategoria:Specjalności lekarskie]]"
+     }
+     
+```
+
+Statystyki:
+```
+> db.page.stats()
+{
+        "ns" : "wikipedia.page",
+        "count" : 1671883,
+        "size" : 7767421936,
+        "avgObjSize" : 4645,
+        "storageSize" : 9305772016,
+        "numExtents" : 23,
+        "nindexes" : 1,
+        "lastExtentSize" : 2146426864,
+        "paddingFactor" : 1,
+        "systemFlags" : 1,
+        "userFlags" : 1,
+        "totalIndexSize" : 46668608,
+        "indexSizes" : {
+                "_id_" : 46668608
+        },
+        "ok" : 1
+}
+```
+
 Mając już zaimportowaną bazę danych wikipedii, napisałem następująca funkcję mapReduce:
 
 ```
 m = function() {
-	var tmp = this.revision.text.match(/[a-zA-Ząśżźęćńół]+/g);
+	var tmp = this.revision.text.match(/\b(?!&)([a-zążśźęćółń]+)(?!;)\b/gi);
 	if (tmp) {
 		for (var i = 0; i < tmp.length; i++)
 			emit(tmp[i], 1)
@@ -168,7 +224,7 @@ m = function() {
 r = function(key, values) {
 	return Array.sum(values);
 };
-var res = db.page.mapReduce(m, r, {out: "slowa"});
+var res = db.page.mapReduce(m, r, {out: "words"});
 ```
 
 |Czas|
@@ -176,48 +232,33 @@ var res = db.page.mapReduce(m, r, {out: "slowa"});
 |8h 34m|
 
 ```
+res
 
-> res
-{
-        "result" : "slowa",
-        "timeMillis" : 20780416,
-        "counts" : {
-                "input" : 1671883,
-                "emit" : 596487211,
-                "reduce" : 63921156,
-                "output" : 4131470
-        },
-        "ok" : 1
-}
+      "result" : "words",
+      "timeMillis" : 23047471,
+      "counts" : {
+              "input" : 1671883,
+              "emit" : 504002499,
+              "reduce" : 61375131,
+              "output" : 4427445
+      },
+      "ok" : 1
 ```
 
 Pozostało sprawdzić, jakie słowa padają najczęściej. Wyniki nie zaskakują, bowiem spójniki pojawiają się najczęściej:
 
 ```
-> db.slowa.find().sort({"value":-1}).limit(10)
-{ "_id" : "w", "value" : 20292468 }
-{ "_id" : "i", "value" : 5780516 }
-{ "_id" : "a", "value" : 5407771 }
-{ "_id" : "align", "value" : 4910641 }
-{ "_id" : "na", "value" : 4872846 }
-{ "_id" : "z", "value" : 4775000 }
-{ "_id" : "ref", "value" : 4264414 }
-{ "_id" : "o", "value" : 3722458 }
-{ "_id" : "data", "value" : 3514935 }
-{ "_id" : "Kategoria", "value" : 3169267 }
+db.words.find().sort({"value":-1}).limit(10)
+"_id" : "w", "value" : 13611027 }
+"_id" : "i", "value" : 5736179 }
+"_id" : "align", "value" : 4910634 }
+"_id" : "na", "value" : 4488300 }
+"_id" : "z", "value" : 4409467 }
+"_id" : "ref", "value" : 4251272 }
+"_id" : "data", "value" : 3381604 }
+"_id" : "Kategoria", "value" : 3169207 }
+"_id" : "do", "value" : 2830715 }
+"_id" : "si", "value" : 2613568 }
 ```
-
-Same wyniki nie są może najlepsze bowiem wyszukują również słowa wykorzystywane podczas formatowania tekstu, lecz jak by nie patrzeć, są to również słowa. Tutaj trzeba by opierać się na zmienie wyrażenia regularnego. Aktualnie wykorzystałem:
-
-```
-/[a-zA-Ząśżźęćńół]+/g
-```
-
-Można by próbować dalej
-```
-/\s[a-ząśżźęćńół]+/gi
-```
-lecz to i tak wciąż nie jest rozwiązanie idealne. Stworzenie idealnego regexa byłoby bardzo skomplikowane, wymagające wielu wyjątków, a i tak nie ma pewności czy ostateczny rezultat nie zmanipuluje wynikami. Zatem wyszedłem z założenia, że lepiej stworzyć prosty skrypt, który da wiarygodne wyniki lecz ze śmieciami, które później na etapie prezentacji danych można usunąć.
-
 
 
