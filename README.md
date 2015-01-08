@@ -136,6 +136,18 @@ db.anagrams.find({$where: "this.value != null"}).count()
 914
 ```
 
+Najpopularniejszy anagram:
+```
+> db.anagrams.find().sort({"value.ilosc": -1}).limit(3)
+{ "_id" : "aceprs", "value" : { "anagramy" : [ "capers", "crapes", "parsec", "pacers", "recaps", "scrape", "spacer" ], "
+ilosc" : 7 } }
+{ "_id" : "acerst", "value" : { "anagramy" : [ "carets", "crates", "caster", "caters", "recast", "reacts", "traces" ], "
+ilosc" : 7 } }
+{ "_id" : "adelst", "value" : { "anagramy" : [ "lasted", "salted", "slated", "staled", "deltas", "desalt" ], "ilosc" : 6
+ } }
+>
+```
+
 ## Punkt drugi
 
 ```
