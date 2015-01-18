@@ -93,6 +93,12 @@ wywołanie zmiennej "res" pozwoli wyświetlić nam podstawowe informacje dotycz�
 }
 ```
 
+![mapReduce 1](https://cloud.githubusercontent.com/assets/1538320/5792180/f4bd062a-9f0b-11e4-902f-048e58688ada.png)
+
+|Czas|
+| ---- |
+|603 ms|
+
 Sama funkcja działa na prostej zasadzie grupowania słów, w oparciu o "słowo" zbudowane z liter w kolejności alfabetycznej. 
 
 Jak zatem widać, udało nam się stworzyć 7011 grup anagramów. Dla potwierdzenia, możemy wykonać następującą komendę:
@@ -147,6 +153,13 @@ ilosc" : 7 } }
  } }
 >
 ```
+
+
+|Słowo|Ilość|
+| ----| ----- |
+|aceprs|7|
+|acerst|7|
+|adelst|6|
 
 ## Punkt drugi
 
@@ -256,6 +269,10 @@ res
       },
       "ok" : 1
 ```
+![mapReduce 2](https://cloud.githubusercontent.com/assets/1538320/5792181/f4c62f52-9f0b-11e4-913a-b1c740f4a144.png)
+
+Poprawność regExpa:
+![regExp](https://cloud.githubusercontent.com/assets/1538320/5792179/f4a12e96-9f0b-11e4-80f6-6bc01798bb35.png)
 
 Pozostało sprawdzić, jakie słowa padają najczęściej. Wyniki nie zaskakują, bowiem spójniki pojawiają się najczęściej:
 
@@ -272,5 +289,5 @@ db.words.find().sort({"value":-1}).limit(10)
 "_id" : "do", "value" : 2830715 }
 "_id" : "si", "value" : 2613568 }
 ```
-
+![Wyniki popularnosci slow](https://cloud.githubusercontent.com/assets/1538320/5792182/f4cbaa04-9f0b-11e4-9002-3f81f70c7ed5.png)
 
