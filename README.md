@@ -15,17 +15,17 @@ Przygotować funkcje map i reduce, które:
 Na początku pobrałem [word_list.txt](http://wbzyl.inf.ug.edu.pl/nosql/doc/data/word_list.txt). Jako, że jest to bardzo prosty plik, to wystarczy zmiana jego rozszerzenia na csv. Dodałem w edytorze w pierwszym wierszu "word" jako nagłówek, który posłuży mi jako nazwa kolumny w bazie.
 
 Importujemy oczywiście plik do bazy:
-```
+```bash
 mongoimport -d wordlist -c words --type csv --file word_list.csv --headerline
 ```
 
-```
+```js
 "imported 8199 objects"
 
-> db.words.findOne()
+db.words.findOne()
 { "_id" : ObjectId("54a13aa1d542ead55c03dfc3"), "word" : "author" }
 
-> db.words.stats()
+db.words.stats()
 {
         "ns" : "wordlist.words",
         "count" : 8199,
